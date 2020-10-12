@@ -1,0 +1,6 @@
+# Ignore folder
+node_modules/
+dist/
+dev/
+.vscode/
+# test/

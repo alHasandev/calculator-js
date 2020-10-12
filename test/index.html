@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Calculator HTML JS</title>
+
+    <!-- Link default css -->
+    <link rel="stylesheet" href="../calculator.default.css" />
+  </head>
+  <body>
+    <h1>This Is Simple Usage of Calculator JS</h1>
+    <div class="calculator-wrapper" style="margin-bottom: 1rem"></div>
+    <div class="calculator-wrapper-1"></div>
+
+    <!-- Calculator script -->
+    <script src="../calculator.js"></script>
+    <script src="./test.js" type="module"></script>
+
+    <script>
+      const calculator = new Calculator();
+      calculator.renderTo(".calculator-wrapper");
+      calculator.initControlsEvent();
+
+      // or you can set identifier and init event to true
+      const calc1 = new Calculator("calc-1", true);
+      calc1.renderTo(".calculator-wrapper-1");
+    </script>
+  </body>
+</html>

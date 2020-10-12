@@ -1,0 +1,27 @@
+{
+  "name": "calculator",
+  "version": "1.0.0",
+  "description": "simple calculator html constructor with js class functionality",
+  "main": "index.js",
+  "type": "module",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alHasandev/calculator-js.git"
+  },
+  "keywords": [
+    "alhasandev",
+    "calculator"
+  ],
+  "author": "albie",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alHasandev/calculator-js/issues"
+  },
+  "homepage": "https://github.com/alHasandev/calculator-js#readme"
+}
