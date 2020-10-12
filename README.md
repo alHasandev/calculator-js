@@ -8,7 +8,12 @@ Run `npm i alhasandev-calculator`
 
 ## HTML
 
-`<div class="calculator-wrapper"></div>`
+```
+<link rel="stylesheet" href="../calculator.default.css" />
+<body>
+  <div class="calculator-wrapper"></div>
+</body>
+```
 
 ## JavaScript:
 
