@@ -10,18 +10,18 @@ Run `npm i alhasandev-calculator`
 
 `<div class="calculator-wrapper"></div>`
 
-Javascript:
+## JavaScript:
 
 ```
 import Calculator from 'alhasandev-calculator'
 
-<!-- Init calculator object -->
+// Init calculator object
 const calculator = new Calculator()
 
-<!-- Render calculator on a html element -->
+// Render calculator on a html element
 calculator.renderTo(".calculator-wrapper");
 
-<!-- Init controls event -->
+// Init controls event
 calculator.initControlsEvent();
 
 ```
