@@ -1,6 +1,6 @@
 {
   "name": "alhasandev-calculator",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "simple calculator html constructor with js class functionality",
   "main": "index.js",
   "type": "module",
