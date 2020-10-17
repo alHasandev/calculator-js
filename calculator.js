@@ -64,7 +64,7 @@ const style = `
 `;
 
 const isOperationKey = (key) => new RegExp(/[\*\/\+\-]/i).test(key);
-const isAllowedKey = (key) => new RegExp(/[0-9]+|[\*\/\+\-]+/i).test(key);
+const isAllowedKey = (key) => new RegExp(/[0-9\.]+|[\*\/\+\-]+/i).test(key);
 
 const allowedKey = new RegExp(/[0-9]+|[x\*\/\+\-]+/i);
 
@@ -77,8 +77,8 @@ const screens = [
 
 const controls = [
   {
-    label: "AC",
-    function: "allClear",
+    label: "C",
+    function: "clear",
   },
   {
     label: "D",
@@ -235,6 +235,37 @@ const createLayout = (wrapper, display, controls) => {
   return wrapper;
 };
 
+const handleInput = (ev, screen, onEnter) => {
+  // handle key such as Enter, Backspace
+  switch (ev.key) {
+    case "Enter":
+      if (typeof onEnter === "function") onEnter(screen);
+      return;
+    case "Backspace":
+      return;
+    default:
+      break;
+  }
+
+  // check if input key is allowed
+  if (!isAllowedKey(ev.key)) return ev.preventDefault();
+
+  // handle input zero (0)
+  if (screen.value === "0") {
+    if (ev.key === "0") {
+      ev.preventDefault();
+    }
+
+    if (!isNaN(ev.key)) {
+      ev.preventDefault();
+      screen.value = ev.key;
+    }
+  }
+
+  // handle point (.)
+  if (screen.value.includes(".") && ev.key === ".") ev.preventDefault();
+};
+
 const compute = (expression = "") => {
   return Function(`"use strict";return ${expression}`)();
 };
@@ -242,29 +273,42 @@ const compute = (expression = "") => {
 // Constructor
 class Calculator {
   constructor(options) {
+    // console.log("controls", this.controls);
     if (!!options && typeof options === "object") {
     }
-    this.htmlElement = createLayout(
-      createWrapper(),
-      this.display,
-      this.controlsSection
-    );
   }
 
   allowedKey = allowedKey;
   screens = screens;
   controls = controls;
 
-  display = createDisplay(this.screens);
-  controlsSection = createControls(this.controls);
   onScreenChange = (value) => {
     console.log("screen value change", value);
     // return true / false for prevent default
     return true;
   };
 
+  createHtmlElement() {
+    if (!this.htmlElement) {
+      this.display = createDisplay(this.screens);
+      this.controlsSection = createControls(this.controls);
+      this.htmlElement = createLayout(
+        createWrapper(),
+        this.display,
+        this.controlsSection
+      );
+    }
+  }
+
+  getHtmlElement() {
+    this.createHtmlElement();
+
+    this.htmlElement;
+  }
+
   renderTo(parent, options) {
     if (!!parent && parent instanceof HTMLElement) {
+      this.createHtmlElement();
       if (!!options && typeof options === "object") {
         if (options.style) {
           const styleWrapper = document.createElement("style");
@@ -281,8 +325,34 @@ class Calculator {
     const number = ev.target.dataset.code;
     const screen = this.display.querySelector("[role=screen]");
 
-    if (ev.target.dataset.code === ".") {
-      if (!screen.value || screen.value.includes(".")) return;
+    if (number === ".") {
+      if (screen.value) {
+        const exprs = screen.value.split(/[\*\/\+\-]/);
+        const lastExpr = exprs[exprs.length - 1];
+        if (lastExpr.includes(".")) return;
+      } else {
+        return;
+      }
+    }
+
+    // handle input zero (0)
+    if (screen.value && screen.value.substr(-1, 1) === "0") {
+      console.log(number);
+      if (
+        number !== "." &&
+        screen.value &&
+        isOperationKey(screen.value.substr(-2, 1))
+      ) {
+        screen.value =
+          screen.value.substr(0, screen.value.length - 1).toString() +
+          number.toString();
+        return;
+      }
+    }
+
+    if (screen.value === "0") {
+      screen.value = number;
+      return;
     }
 
     screen.value += number.toString();
@@ -291,20 +361,30 @@ class Calculator {
   appendOperation = (ev) => {
     const operation = ev.target.dataset;
     const screen = this.display.querySelector("[role=screen]");
-
-    if (!screen.value || isNaN(screen.value.substr(-1, 1))) {
+    const lastCode = screen.value.substr(-1, 1);
+    if (!screen.value || isNaN(lastCode)) {
+      // allow a**b
+      if (lastCode === "*" && operation.code === "*") {
+        console.log(lastCode, operation.code, screen.value.substr(-2, 2));
+        if (screen.value.substr(-2, 2) !== "**") screen.value += operation.code;
+        return;
+      }
       if (screen.value) return;
-      if (ev.target.dataset.code !== "-") return;
+      if (operation.code !== "-") return;
     }
 
     screen.value += operation.code;
   };
 
-  allClear() {
+  clear() {
+    const callback = this.onClear();
+    if (!callback && callback !== undefined) return;
     const screen = this.display.querySelector("[role=screen]");
 
     screen.value = "";
   }
+
+  onClear() {}
 
   percent() {
     const screen = this.display.querySelector("[role=screen]");
@@ -317,13 +397,22 @@ class Calculator {
   }
 
   delete() {
+    const callback = this.onDelete();
+    if (!callback && callback !== undefined) return;
+
     const screen = this.display.querySelector("[role=screen]");
 
     screen.value = screen.value.substr(0, screen.value.length - 1);
   }
 
+  onDelete() {
+    return true;
+  }
+
   submit() {
-    if (!this.onSubmit()) return;
+    const callback = this.onSubmit();
+    if (!callback && callback !== undefined) return;
+
     const screen = this.display.querySelector("[role=screen]");
     const len = screen.value.length;
     if (len === 0) return;
@@ -346,15 +435,10 @@ class Calculator {
     }
 
     screen.onkeydown = (ev) => {
-      switch (ev.key) {
-        case "Enter":
-        case "Backspace":
-          return;
-        default:
-          break;
-      }
       if (!this.onScreenChange(ev.key)) ev.preventDefault();
-      if (!isAllowedKey(ev.key)) ev.preventDefault();
+      handleInput(ev, screen, () => {
+        this.submit();
+      });
     };
 
     const buttons = this.controlsSection.querySelectorAll("[role=control]");
