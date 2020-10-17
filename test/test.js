@@ -1,5 +1,10 @@
-import Calculator from "../index.js";
+const calculator = new Calculator();
 
-const calc = new Calculator("test", true);
+console.log(calculator);
 
-console.log(calc);
+const calcWrapper1 = document.querySelector(".calculator-wrapper");
+calculator.renderTo(calcWrapper1, {
+  style: true,
+});
+
+calculator.initControl();

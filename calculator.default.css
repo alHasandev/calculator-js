@@ -7,44 +7,30 @@
   box-shadow: 0 1px 5px 1px rgba(0, 0, 0, 0.3);
 }
 
-/* .calculator.wrapper:focus {
-  outline-color: blue;
-} */
-
-.calculator .displays {
+.calculator [role="display"] {
   margin-bottom: 0.5rem;
   border: 1px solid black;
 }
 
-.calculator .screen {
+.calculator [role="screen"] {
   box-sizing: border-box;
   text-align: right;
   width: 100%;
   padding: 0.5rem;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   border: none;
   outline: none;
-  /* pointer-events: none; */
   cursor: pointer;
 }
 
-.calculator .controls {
+.calculator [role="controls"] {
   display: grid;
   column-gap: 0.5rem;
   row-gap: 0.25rem;
   grid-template-columns: repeat(4, 1fr);
 }
 
-.calculator .btn {
+.calculator [role="control"] {
   cursor: pointer;
   padding: 0.25rem;
-}
-
-/* .input-calculator {
-  pointer-events: none;
-} */
-
-/* extra utilities */
-.max-width-32 {
-  max-width: 32rem;
 }

@@ -10,21 +10,15 @@
   </head>
   <body>
     <h1>This Is Simple Usage of Calculator JS</h1>
-    <div class="calculator-wrapper" style="margin-bottom: 1rem"></div>
+
+    <div
+      class="calculator-wrapper"
+      style="margin-bottom: 1rem; max-width: 20rem"
+    ></div>
     <div class="calculator-wrapper-1"></div>
 
     <!-- Calculator script -->
     <script src="../calculator.js"></script>
-    <!-- <script src="./test.js" type="module"></script> -->
-
-    <script>
-      const calculator = new Calculator();
-      calculator.renderTo(".calculator-wrapper");
-      calculator.initControlsEvent();
-
-      // or you can set identifier and init event to true
-      const calc1 = new Calculator("calc-1", true);
-      calc1.renderTo(".calculator-wrapper-1");
-    </script>
+    <script src="./test.js" type="module"></script>
   </body>
 </html>
