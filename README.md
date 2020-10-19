@@ -2,6 +2,8 @@
 
 A simple calculator class constructor with function in js
 
+![alt text](https://alhasandev.github.io/calculator-js/test/preview.png)
+
 ## Instalation
 
 Run `npm i alhasandev-calculator`
