@@ -66,6 +66,7 @@ export const style = `
 export const isOperationKey = (key) => new RegExp(/[\*\/\+\-]/i).test(key);
 export const isAllowedKey = (key) =>
   new RegExp(/[0-9\.]+|[\*\/\+\-]+/i).test(key);
+export const regexs = new RegExp(/([0-9]+(\.\w+)?)|([\*\/\+\-])+/g);
 
 export const allowedKey = new RegExp(/[0-9]+|[x\*\/\+\-]+/i);
 
@@ -252,19 +253,44 @@ export const handleInput = (ev, screen, onEnter) => {
   if (!isAllowedKey(ev.key)) return ev.preventDefault();
 
   // handle input zero (0)
-  if (screen.value === "0") {
-    if (ev.key === "0") {
+  if (screen.value && screen.value.substr(-1, 1) === "0") {
+    // check if key is operation
+    if (isOperationKey(ev.key)) return;
+    if (
+      ev.key !== "." &&
+      screen.value &&
+      isOperationKey(screen.value.substr(-2, 1))
+    ) {
       ev.preventDefault();
+      screen.value =
+        screen.value.substr(0, screen.value.length - 1).toString() +
+        ev.key.toString();
+      return;
     }
+  }
 
-    if (!isNaN(ev.key)) {
-      ev.preventDefault();
-      screen.value = ev.key;
-    }
+  if (screen.value === "0") {
+    ev.preventDefault();
+    screen.value = ev.key;
+    return;
   }
 
   // handle point (.)
   if (screen.value.includes(".") && ev.key === ".") ev.preventDefault();
+
+  // handle operation (*/+-)
+  if (isOperationKey(ev.key)) {
+    const lastCode = screen.value.substr(-1, 1);
+    if (!screen.value || isNaN(lastCode)) {
+      // allow a**b
+      if (lastCode === "*" && ev.key === "*") {
+        if (screen.value.substr(-2, 2) === "**") ev.preventDefault();
+        return;
+      }
+      if (screen.value) return ev.preventDefault();
+      if (ev.key !== "-") return ev.preventDefault();
+    }
+  }
 };
 
 export const compute = (expression = "") => {
@@ -337,6 +363,20 @@ export default class Calculator {
     }
 
     // handle input zero (0)
+    if (screen.value && screen.value.substr(-1, 1) === "0") {
+      // console.log(number);
+      if (
+        number !== "." &&
+        screen.value &&
+        isOperationKey(screen.value.substr(-2, 1))
+      ) {
+        screen.value =
+          screen.value.substr(0, screen.value.length - 1).toString() +
+          number.toString();
+        return;
+      }
+    }
+
     if (screen.value === "0") {
       screen.value = number;
       return;
@@ -352,12 +392,12 @@ export default class Calculator {
     if (!screen.value || isNaN(lastCode)) {
       // allow a**b
       if (lastCode === "*" && operation.code === "*") {
-        console.log(lastCode, operation.code, screen.value.substr(-2, 2));
+        // console.log(lastCode, operation.code, screen.value.substr(-2, 2));
         if (screen.value.substr(-2, 2) !== "**") screen.value += operation.code;
         return;
       }
       if (screen.value) return;
-      if (ev.target.dataset.code !== "-") return;
+      if (operation.code !== "-") return;
     }
 
     screen.value += operation.code;
@@ -376,7 +416,43 @@ export default class Calculator {
   percent() {
     const screen = this.display.querySelector("[role=screen]");
 
-    screen.value = screen.value / 100;
+    if (screen.value) {
+      const lastCode = screen.value.substr(-1, 1);
+      if (!isOperationKey(lastCode)) {
+        const exprs = screen.value.match(/([0-9]+(\.\w+)?)|([\*\/\+\-])+/g);
+
+        const lastNumber = exprs[exprs.length - 1];
+        let nDec = 0;
+        if (!Number.isInteger(lastNumber)) {
+          const nStr = lastNumber.toString();
+          const nIndex = nStr.indexOf(".");
+          const n = nStr.slice(nIndex + 1);
+          console.log(n);
+          nDec = n.length;
+        }
+
+        let divided = lastNumber / 100;
+
+        if (!Number.isInteger(divided)) {
+          const divStr = divided.toString();
+          const pIndex = divStr.indexOf(".");
+          const dec = divStr.slice(pIndex + 1);
+
+          if (dec.length - nDec > 2) {
+            // console.log(dec, nDec);
+            divided = divided.toFixed(nDec + 2);
+          }
+        }
+
+        if (exprs.length > 1)
+          return (screen.value =
+            exprs.slice(0, exprs.length - 1).join("") + divided);
+
+        screen.value = divided;
+      } else {
+        return;
+      }
+    }
   }
 
   extra() {
@@ -405,8 +481,11 @@ export default class Calculator {
     if (len === 0) return;
     const lastChar = screen.value.substr(-1, 1);
     if (isOperationKey(lastChar))
-      screen.value = screen.value = screen.value.substr(0, len - 1);
-    screen.value = compute(screen.value);
+      screen.value = screen.value.substr(0, len - 1);
+    let value = compute(screen.value);
+    if (!Number.isInteger(value)) value = value.toFixed(2);
+
+    screen.value = value;
   }
 
   onSubmit() {
