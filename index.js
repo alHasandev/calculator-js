@@ -343,7 +343,7 @@ export default class Calculator {
           parent.append(styleWrapper);
         }
       }
-
+      console.log(parent);
       parent.append(this.htmlElement);
     }
   }
@@ -409,6 +409,7 @@ export default class Calculator {
     const screen = this.display.querySelector("[role=screen]");
 
     screen.value = "";
+    if (typeof callback === "function") callback(value);
   }
 
   onClear() {}
@@ -486,6 +487,7 @@ export default class Calculator {
     if (!Number.isInteger(value)) value = value.toFixed(2);
 
     screen.value = value;
+    if (typeof callback === "function") callback(value);
   }
 
   onSubmit() {

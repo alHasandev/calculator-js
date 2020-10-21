@@ -1,11 +1,9 @@
-import Calculator, { compute } from "../index.js";
+// import Calculator, { compute } from "../index.js";
 const calculator = new Calculator();
-const calc = new Calculator();
 
 console.log("2^2 =", compute("2^2"));
 
 const calcWrapper1 = document.querySelector(".calculator-wrapper");
-const calcWrapper2 = document.querySelector(".calculator-wrapper-1");
 
 // set controls list
 // calculator.controls = [
@@ -41,9 +39,3 @@ calculator.renderTo(calcWrapper1, {
 });
 
 calculator.initControl();
-
-calc.renderTo(calcWrapper2, {
-  style: true,
-});
-
-calc.initControl();

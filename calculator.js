@@ -408,6 +408,7 @@ class Calculator {
     const screen = this.display.querySelector("[role=screen]");
 
     screen.value = "";
+    if (typeof callback === "function") callback(value);
   }
 
   onClear() {}
@@ -485,6 +486,7 @@ class Calculator {
     if (!Number.isInteger(value)) value = value.toFixed(2);
 
     screen.value = value;
+    if (typeof callback === "function") callback(value);
   }
 
   onSubmit() {
